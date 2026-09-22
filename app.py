@@ -3,7 +3,7 @@ import tensorflow as tf
 import numpy as np
 
 model = tf.keras.models.load_model("employee_performance_ann.keras")
-
+scaler = joblib.load("scaler.pkl")
 st.title("Employee Performance Prediction")
 
 st.write(
@@ -30,8 +30,9 @@ attendance = st.number_input(
 
 if st.button("Predict"):
 
-
     input_data = np.array([[training_hours, attendance]])
+
+    input_data = scaler.transform(input_data)
 
    
     probability = model.predict(
@@ -40,7 +41,7 @@ if st.button("Predict"):
     )[0][0]
 
 
-    prediction = 1 if probability >= 0.5 else 0
+    prediction= model.predict(input_data, verbose=0)[0][0]
 
    
     if prediction == 1:
