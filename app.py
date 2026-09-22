@@ -1,25 +1,15 @@
 import streamlit as st
 import tensorflow as tf
 import numpy as np
-import joblib
 model = tf.keras.models.load_model("employee_performance_ann.keras")
-scaler = joblib.load("scaler.pkl")
 st.title("Employee Performance Prediction")
-
-st.write(
-    "Enter the employee's training hours and attendance "
-    "to predict performance."
-)
-
-
-
-training_hours = st.number_input(
+st.write("Enter the employee's training hours and attendance to predict performance.")
+study_hours = st.number_input(
     "Training Hours",
     min_value=0.0,
     max_value=20.0,
     value=5.0
 )
-
 
 attendance = st.number_input(
     "Attendance (%)",
@@ -30,26 +20,15 @@ attendance = st.number_input(
 
 if st.button("Predict"):
 
-    input_data = np.array([[training_hours, attendance]])
+    input_data = np.array([[study_hours, attendance]])
 
-    input_data = scaler.transform(input_data)
+    probability = model.predict(input_data, verbose=0)[0][0]
+    prediction = 1 if probability >= 0.5 else 0
 
-   
-    probability = model.predict(
-        input_data,
-        verbose=0
-    )[0][0]
-
-
-    prediction= model.predict(input_data, verbose=0)[0][0]
-
-   
     if prediction == 1:
         st.success("Good Performance")
     else:
         st.error("Needs Improvement")
 
- 
-    st.write(
-        f"Probability of Good Performance: {probability:.2%}"
-    )
+
+    st.write(f"Probability of Good Performance: {probability:.2%}")
